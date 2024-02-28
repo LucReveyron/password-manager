@@ -4,6 +4,15 @@
 std::mt19937 gen;
 
 std::vector<uint8_t> generate_random_numbers(int8_t max_value, int8_t lenght) {
+    /*
+    Generate vector of random number
+
+    Input : 
+        - max_value : define boundary for normal distribution of random generation
+        - lenght : define the lenght of the vector
+    Output: vector of random number
+    */
+
     // Define the distribution
     std::uniform_int_distribution<> dis(0, max_value);
 
@@ -39,7 +48,7 @@ std::string create_password(uint8_t pass_lenght, bool rand)
         gen.seed(rd());
     }
     else{
-        gen.seed(50); // Seed with a fixed value
+        gen.seed(SEED); // Seed with a fixed value
     }
 
     std::string password = "";

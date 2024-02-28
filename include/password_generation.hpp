@@ -5,6 +5,8 @@
 #include <string>
 #include <random>
 
+#define SEED 50
+
 const std::vector<int> allowed_characters = {
     // Lowercase letters (97 - 122)
     // Uppercase letters (65 - 90)
