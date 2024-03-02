@@ -6,7 +6,7 @@
 #include "../include/password_generation.hpp"
 
 // Test case
-TEST_CASE("Test if generateRandomValue returns a value between 0 and 2") {
+TEST_CASE("Test if generate_random_numbers returns a value between 0 and 2") {
 
     std::mt19937 gen(42);
 

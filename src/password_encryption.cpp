@@ -1,11 +1,17 @@
 #include <iostream>
 #include "../include/password_encryption.hpp"
 
-// Key for AES encryption and decryption (128 bits = 16 bytes)
-unsigned char aes_key[] = "0123456789abcdef";
+void derivekey_from_password(const std::string& password, unsigned char* derivedKey, unsigned char* salt)
+{
+    const unsigned int iterations = 10000; // Number of iterations
+    const unsigned int keyLength = 32; // 256-bit key length
 
-// Initialization Vector (IV) for AES encryption (128 bits = 16 bytes)
-unsigned char iv[] = "1234567890123456";
+    // Generate a random salt
+    RAND_bytes(salt, sizeof(salt));
+
+    // Derive the key using PBKDF2
+    PKCS5_PBKDF2_HMAC_SHA1(password.c_str(), password.length(), salt, sizeof(salt), iterations, keyLength, derivedKey);
+}
 
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
             unsigned char *iv, unsigned char *ciphertext)
