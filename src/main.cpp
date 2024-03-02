@@ -1,56 +1,68 @@
 #include <iostream>
-#include <openssl/sha.h>
-#include <openssl/rand.h>
-
-// Function to generate a random string of specified length
-std::string generateRandomString(int length) {
-    std::string str(length, '\0');
-    RAND_bytes(reinterpret_cast<unsigned char*>(&str[0]), length);
-    return str;
-}
-
-// Function to calculate SHA-256 hash of a string
-std::string calculateSHA256(const std::string& input) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, input.c_str(), input.length());
-    SHA256_Final(hash, &sha256);
-
-    std::string hashStr;
-    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
-        hashStr += hash[i];
-    }
-    return hashStr;
-}
-
-int main() {
-    // Generate a random string
-    std::string randomString = generateRandomString(16);
-
-    // Calculate SHA-256 hash of the random string
-    std::string hash = calculateSHA256(randomString);
-
-    // Print the random string and its SHA-256 hash
-    std::cout << "Random String: " << randomString << std::endl;
-    std::cout << "SHA-256 Hash: ";
-    for (char c : hash) {
-        printf("%02x", static_cast<unsigned char>(c));
-    }
-    std::cout << std::endl;
-
-    return 0;
-}
-
-/*
-#include <iostream>
 #include "../include/password_generation.hpp"
+#include "../include/password_encryption.hpp"
 
-int main() {
+int main (void)
+{
+    /*
+     * Set up the key and iv. Do I need to say to not hard code these in a
+     * real application? :-)
+     */
+
+    /* A 256 bit key */
+    unsigned char key[] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+                           0x38, 0x39, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35,
+                           0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32, 0x33,
+                           0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31
+                         };
+
+    /* A 128 bit IV */
+    unsigned char iv[] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+                          0x38, 0x39, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35
+                        };
+
+    // Generate a password 
     int8_t pass_lenght = 12;
     std::string password = "";
     password = create_password(pass_lenght);
+
+    // Print the original password
+    std::cout << "Password: ";
     std::cout << password << std::endl;
-    return 0;
+    
+    /* Message to be encrypted */
+    unsigned char *plaintext =
+        (unsigned char *)password.c_str();
+
+    /*
+     * Buffer for ciphertext. Ensure the buffer is long enough for the
+     * ciphertext which may be longer than the plaintext, depending on the
+     * algorithm and mode.
+     */
+    unsigned char ciphertext[128];
+
+    /* Buffer for the decrypted text */
+    unsigned char decryptedtext[128];
+
+    int decryptedtext_len, ciphertext_len;
+
+    /* Encrypt the plaintext */
+    ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, iv,
+                              ciphertext);
+
+    /* Do something useful with the ciphertext here */
+    printf("Ciphertext is:\n");
+    BIO_dump_fp (stdout, (const char *)ciphertext, ciphertext_len);
+
+    /* Decrypt the ciphertext */
+    decryptedtext_len = decrypt(ciphertext, ciphertext_len, key, iv,
+                                decryptedtext);
+
+    /* Add a NULL terminator. We are expecting printable text */
+    decryptedtext[decryptedtext_len] = '\0';
+
+    /* Show the decrypted text */
+    printf("Decrypted text is:\n");
+    printf("%s\n", decryptedtext);
+
 }
-*/
