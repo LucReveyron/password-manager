@@ -10,9 +10,9 @@ int main (void)
     std::string masterPassword = "MySuperSecureMasterPassword";
 
     // Derive a 256-bit key from the master password
-    unsigned char key[32] = {0};;
+    unsigned char key[KEY_SIZE] = {0};;
     // Salt for PBKDF2
-    unsigned char salt[16] = {0};
+    unsigned char salt[SALT_SIZE] = {0};
 
     derivekey_from_password(masterPassword, key, salt);
 
@@ -42,8 +42,8 @@ int main (void)
     RAND_bytes(iv, EVP_CIPHER_iv_length(EVP_aes_256_cbc()));
 
     // Encrypt the plaintext 
-    ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, iv,
-                              ciphertext);
+    ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key,KEY_SIZE, iv,
+                              EVP_CIPHER_iv_length(EVP_aes_256_cbc()), ciphertext);
 
    // Do something useful with the ciphertext here 
     printf("Ciphertext is:\n");

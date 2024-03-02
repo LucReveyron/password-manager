@@ -13,9 +13,18 @@ void derivekey_from_password(const std::string& password, unsigned char* derived
     PKCS5_PBKDF2_HMAC_SHA1(password.c_str(), password.length(), salt, sizeof(salt), iterations, keyLength, derivedKey);
 }
 
-int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-            unsigned char *iv, unsigned char *ciphertext)
+int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int key_lenght,
+            unsigned char *iv, int iv_lenght, unsigned char *ciphertext)
 {
+    // Check if any input pointer is null
+    if(plaintext == nullptr || key == nullptr || iv == nullptr || ciphertext == nullptr){
+        return -1;
+    }
+
+    // Check key and IV size 
+    if(key_lenght != KEY_SIZE || iv_lenght != EVP_CIPHER_iv_length(EVP_aes_256_cbc()))
+        return -1;
+
     EVP_CIPHER_CTX *ctx;
 
     int len;
@@ -23,8 +32,10 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
     int ciphertext_len;
 
     /* Create and initialise the context */
-    if(!(ctx = EVP_CIPHER_CTX_new()))
+    if(!(ctx = EVP_CIPHER_CTX_new())){
         handleErrors();
+        return -1;
+    }
 
     /*
      * Initialise the encryption operation. IMPORTANT - ensure you use a key
@@ -33,23 +44,32 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
      * IV size for *most* modes is the same as the block size. For AES this
      * is 128 bits
      */
-    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    if(EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1){
         handleErrors();
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    }
 
     /*
      * Provide the message to be encrypted, and obtain the encrypted output.
      * EVP_EncryptUpdate can be called multiple times if necessary
      */
-    if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+    if(EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len) != 1){
         handleErrors();
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    } 
     ciphertext_len = len;
 
     /*
      * Finalise the encryption. Further ciphertext bytes may be written at
      * this stage.
      */
-    if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
+    if(EVP_EncryptFinal_ex(ctx, ciphertext + len, &len) != 1){
         handleErrors();
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    }
     ciphertext_len += len;
 
     /* Clean up */

@@ -1,8 +1,9 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "../include/doctest_header.hpp"
+
 #include <iostream>
 #include <random>
 #include <algorithm> // for std::max_element
-#include "../include/doctest.h"
 #include "../include/password_generation.hpp"
 
 // Test case
@@ -33,4 +34,3 @@ TEST_CASE("Test password generation") {
     // Check generation example
     CHECK(password == "i7T0I1&VM2Gd");
 }
-
