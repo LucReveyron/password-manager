@@ -3,7 +3,7 @@
 
 void derivekey_from_password(const std::string& password, unsigned char* derivedKey, unsigned char* salt)
 {
-    const unsigned int iterations = 10000; // Number of iterations
+    const unsigned int iterations = NBR_ITERATIONS; // Number of iterations
     const unsigned int keyLength = 32; // 256-bit key length
 
     // Generate a random salt
@@ -32,10 +32,8 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int
     int ciphertext_len;
 
     /* Create and initialise the context */
-    if(!(ctx = EVP_CIPHER_CTX_new())){
-        handleErrors();
-        return -1;
-    }
+    if(!(ctx = EVP_CIPHER_CTX_new()))
+        handle_errors();
 
     /*
      * Initialise the encryption operation. IMPORTANT - ensure you use a key
@@ -45,9 +43,8 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int
      * is 128 bits
      */
     if(EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1){
-        handleErrors();
         EVP_CIPHER_CTX_free(ctx);
-        return -1;
+        handle_errors();
     }
 
     /*
@@ -55,9 +52,8 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int
      * EVP_EncryptUpdate can be called multiple times if necessary
      */
     if(EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len) != 1){
-        handleErrors();
         EVP_CIPHER_CTX_free(ctx);
-        return -1;
+        handle_errors();
     } 
     ciphertext_len = len;
 
@@ -66,9 +62,8 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int
      * this stage.
      */
     if(EVP_EncryptFinal_ex(ctx, ciphertext + len, &len) != 1){
-        handleErrors();
         EVP_CIPHER_CTX_free(ctx);
-        return -1;
+        handle_errors();
     }
     ciphertext_len += len;
 
@@ -89,7 +84,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 
     /* Create and initialise the context */
     if(!(ctx = EVP_CIPHER_CTX_new()))
-        handleErrors();
+        handle_errors();
 
     /*
      * Initialise the decryption operation. IMPORTANT - ensure you use a key
@@ -98,23 +93,29 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
      * IV size for *most* modes is the same as the block size. For AES this
      * is 128 bits
      */
-    if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-        handleErrors();
+    if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)){
+        EVP_CIPHER_CTX_free(ctx);
+        handle_errors();
+    }
 
     /*
      * Provide the message to be decrypted, and obtain the plaintext output.
      * EVP_DecryptUpdate can be called multiple times if necessary.
      */
-    if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
-        handleErrors();
+    if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)){
+        EVP_CIPHER_CTX_free(ctx);
+        handle_errors();
+    }
     plaintext_len = len;
 
     /*
      * Finalise the decryption. Further plaintext bytes may be written at
      * this stage.
      */
-    if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
-        handleErrors();
+    if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)){
+        EVP_CIPHER_CTX_free(ctx);
+        handle_errors();
+    }
     plaintext_len += len;
 
     /* Clean up */
@@ -123,7 +124,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     return plaintext_len;
 }
 
-void handleErrors(void)
+void handle_errors(void)
 {
     ERR_print_errors_fp(stderr);
     abort();

@@ -9,14 +9,16 @@
 #include <vector>
 #include <string>
 
-#define KEY_SIZE    32
-#define SALT_SIZE   16
+#define NBR_ITERATIONS  10000
+#define KEY_SIZE        32
+#define SALT_SIZE       16
+#define NULL_SIZE       1
 
 void derivekey_from_password(const std::string& password, unsigned char* derivedKey, unsigned char* salt);
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int key_lenght,
             unsigned char *iv, int iv_lenght, unsigned char *ciphertext);
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
             unsigned char *iv, unsigned char *plaintext);
-void handleErrors(void);
+void handle_errors(void);
 
 #endif  // PASSWORD_ENCRYPTION_HPP
