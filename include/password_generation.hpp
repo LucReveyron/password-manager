@@ -25,6 +25,8 @@ const std::vector<int> allowed_characters = {
 
 std::vector<uint8_t> generate_random_numbers(int8_t max_value, int8_t lenght);
 std::string create_password(uint8_t pass_lenght, bool rand = true);
+std::string base64_encode(const unsigned char* input, size_t input_len);
+unsigned char* base64_decode(const std::string& input, size_t& output_len);
 std::string return_encrypted_password(std::string master_password, unsigned char* salt, unsigned char* iv);
 
 #endif  // PASSWORD_GENERATION_HPP

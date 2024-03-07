@@ -2,7 +2,6 @@
 #include "../include/password_generation.hpp"
 #include "../include/password_manager.hpp"
 
-
 void string_to_unsigned_char(const std::string& str, unsigned char* uchar_texto, size_t size)
 {
     std::copy(str.begin(), str.begin() + std::min(str.size(), size), uchar_texto);
@@ -32,8 +31,9 @@ void PasswordManager::add_password(const std::string &login)
 
     std::string encrypted_password = return_encrypted_password(master_password, salt, iv);
     std::cout << encrypted_password << std::endl;
-    VaultNode node(login, encrypted_password, std::string(reinterpret_cast<const char*>(salt), SALT_SIZE), 
-                                            std::string(reinterpret_cast<const char*>(iv), SALT_SIZE));
+    VaultNode node(login, encrypted_password, base64_encode(salt, SALT_SIZE), 
+                                            base64_encode(iv, SALT_SIZE));
+
     vault.add_node(node);
 }
 
@@ -51,13 +51,25 @@ void PasswordManager::search_passwords()
     if (choice > 0 && static_cast<size_t>(choice) <= nodes.size()) {
         auto& node = nodes[choice - 1];
         // Convert data from vault to unsigned char 
-        unsigned char encrypted_password[PASS_SIZE];
-        std::cout << node.encrypted_password << std::endl;
-        string_to_unsigned_char(node.encrypted_password, encrypted_password, PASS_SIZE);
-        unsigned char salt[SALT_SIZE];
-        string_to_unsigned_char(node.salt, salt, SALT_SIZE);
-        unsigned char iv[EVP_CIPHER_iv_length(EVP_aes_256_cbc())];
-        string_to_unsigned_char(node.iv, iv, EVP_CIPHER_iv_length(EVP_aes_256_cbc()));
+        size_t encrypt_password_size = 0;
+        unsigned char* encrypted_password = base64_decode(node.encrypted_password, encrypt_password_size);
+        size_t salt_size = 0;
+        unsigned char* salt = base64_decode(node.salt, salt_size);
+        size_t iv_size = 0;
+        unsigned char* iv= base64_decode(node.iv, iv_size);
+
+        /* DEBUGGING */
+        std::cout << " encoded password : " << node.encrypted_password << std::endl;
+        std::cout << " encoded salt : " << node.salt << std::endl;
+        std::cout << " encoded iv : " << node.iv << std::endl;
+
+        printf("Decoded password: ");
+        BIO_dump_fp (stdout, (const char *)encrypted_password, encrypt_password_size);
+        printf("Decoded salt: ");
+        BIO_dump_fp (stdout, (const char *)salt, salt_size);
+        printf("Decoded iv: ");
+        BIO_dump_fp (stdout, (const char *)iv, iv_size);
+        /* DEBUGGING */
 
         std::string master_password = "";
         std::cout << "Please enter the master password : \n";
@@ -65,10 +77,15 @@ void PasswordManager::search_passwords()
         unsigned char key[KEY_SIZE] = {0};
         derivekey_from_password(master_password, key, salt);
 
-        unsigned char decrypted_password[PASS_SIZE];
+        unsigned char decrypted_password[encrypt_password_size];
         //Bug here !!!
-        int decryptedtext_len = decrypt(encrypted_password, PASS_SIZE, key, iv, decrypted_password); 
+        std::cout << " decode pass size  : " << encrypt_password_size << std::endl;
+        int decryptedtext_len = decrypt(encrypted_password, encrypt_password_size, key, iv, decrypted_password); 
         std::cout << "Password for " << node.identifier << ": " << decrypted_password << std::endl;
+
+        delete[] encrypted_password; // Free the allocated memory
+        delete[] salt; // Free the allocated memory
+        delete[] iv; // Free the allocated memory
     }
 }
 

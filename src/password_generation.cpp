@@ -1,6 +1,9 @@
 #include "../include/password_generation.hpp"
 #include "../include/password_encryption.hpp"
 #include <iostream>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <cstring> // for memcpy
 
 // Define a global random number generator engine
 std::mt19937 gen;
@@ -65,10 +68,46 @@ std::string create_password(uint8_t pass_lenght, bool rand)
     return password;
 }
 
+// Base64 encode binary data
+std::string base64_encode(const unsigned char* input, size_t input_len) {
+    BIO* bio = BIO_new(BIO_s_mem());
+    BIO* b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    bio = BIO_push(b64, bio);
+    BIO_write(bio, input, input_len);
+    BIO_flush(bio);
+    BUF_MEM* bufferPtr;
+    BIO_get_mem_ptr(bio, &bufferPtr);
+    std::string encoded(bufferPtr->data, bufferPtr->length);
+    BIO_free_all(bio);
+    return encoded;
+}
+
+// Base64 decode string data
+unsigned char* base64_decode(const std::string& input, size_t& output_len) {
+    BIO* bio = BIO_new_mem_buf(input.data(), input.size());
+    BIO* b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    bio = BIO_push(b64, bio);
+
+    // Dynamically allocate memory to hold the decoded data
+    unsigned char* buffer = new unsigned char[input.size()]; // Allocate enough memory
+
+    size_t total_read = 0;
+    int readBytes;
+    while ((readBytes = BIO_read(bio, buffer + total_read, input.size() - total_read)) > 0) {
+        total_read += readBytes;
+    }
+    BIO_free_all(bio);
+    
+    output_len = total_read;
+    return buffer; // Return the dynamically allocated buffer
+}
+
 std::string return_encrypted_password(std::string master_password, unsigned char* salt, unsigned char* iv)
 {
     // Derive a 256-bit key from the master password
-    unsigned char key[KEY_SIZE] = {0};
+    unsigned char key[KEY_SIZE];
     derivekey_from_password(master_password, key, salt);
 
     // Generate a password 
@@ -81,17 +120,18 @@ std::string return_encrypted_password(std::string master_password, unsigned char
         (unsigned char *)password.c_str();
 
     //Buffer for ciphertext
-    unsigned char encrypted_password[PASS_SIZE] = {0};
+    unsigned char encrypted_password[128];
     int ciphertext_len = 0;
 
     // Generate random IV at each encryption
     RAND_bytes(iv, EVP_CIPHER_iv_length(EVP_aes_256_cbc()));
 
     // Encrypt the plaintext 
-    ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key,KEY_SIZE, iv,
+    ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, sizeof(key), iv,
                               EVP_CIPHER_iv_length(EVP_aes_256_cbc()), encrypted_password);
 
-    std::cout << ciphertext_len << std::endl;
-
-    return std::string(reinterpret_cast<const char*>(encrypted_password), KEY_SIZE);
+    std::cout << " Encoded password : " << ciphertext_len << std::endl;
+    std::string encoded_password = base64_encode(encrypted_password, ciphertext_len);
+    std::cout << " Encoded password : " << encoded_password << std::endl;
+    return encoded_password;
 }

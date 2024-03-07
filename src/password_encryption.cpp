@@ -3,14 +3,21 @@
 
 void derivekey_from_password(const std::string& password, unsigned char* derivedKey, unsigned char* salt)
 {
-    const unsigned int iterations = NBR_ITERATIONS; // Number of iterations
-    const unsigned int keyLength = 32; // 256-bit key length
-
-    // Generate a random salt
-    RAND_bytes(salt, sizeof(salt));
+    // Generate a random salt only if it's not already provided
+    if (salt[0] == '\0') {
+        RAND_bytes(salt, SALT_SIZE);
+    }
 
     // Derive the key using PBKDF2
-    PKCS5_PBKDF2_HMAC_SHA1(password.c_str(), password.length(), salt, sizeof(salt), iterations, keyLength, derivedKey);
+    PKCS5_PBKDF2_HMAC_SHA1(
+        password.c_str(),
+        static_cast<int>(password.length()),
+        salt,
+        SALT_SIZE,
+        NBR_ITERATIONS,
+        KEY_SIZE,
+        derivedKey
+    );
 }
 
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int key_lenght,
@@ -90,7 +97,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     /* Create and initialise the context */
     if(!(ctx = EVP_CIPHER_CTX_new()))
         handle_errors();
-
+    std::cout << " ok : " << 1 << std::endl;
     /*
      * Initialise the decryption operation. IMPORTANT - ensure you use a key
      * and IV size appropriate for your cipher
@@ -102,7 +109,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
         EVP_CIPHER_CTX_free(ctx);
         handle_errors();
     }
-
+    std::cout << " ok : " << 2 << std::endl;
     /*
      * Provide the message to be decrypted, and obtain the plaintext output.
      * EVP_DecryptUpdate can be called multiple times if necessary.
@@ -112,20 +119,22 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
         handle_errors();
     }
     plaintext_len = len;
-
+    std::cout << " ok : " << 3 << std::endl;
     /*
      * Finalise the decryption. Further plaintext bytes may be written at
      * this stage.
      */
     if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)){
         EVP_CIPHER_CTX_free(ctx);
+        std::cerr << "Decryption failed.\n";
+        ERR_print_errors_fp(stderr);  // Print the OpenSSL error stack to stderr
         handle_errors();
     }
     plaintext_len += len;
-
+    std::cout << " ok : " << 4 << std::endl;
     /* Clean up */
     EVP_CIPHER_CTX_free(ctx);
-
+    std::cout << " ok : " << 5 << std::endl;
     return plaintext_len;
 }
 

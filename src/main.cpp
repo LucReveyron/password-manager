@@ -107,10 +107,10 @@ int main (void)
         (unsigned char *)password.c_str();
 
     //Buffer for ciphertext
-    unsigned char ciphertext[128] = {0};
+    unsigned char ciphertext[PASS_SIZE] = {0};
 
     // Buffer for the decrypted text 
-    unsigned char decryptedtext[128] = {0};
+    unsigned char decryptedtext[PASS_SIZE] = {0};
 
     int decryptedtext_len = 0, ciphertext_len = 0;
 
@@ -118,8 +118,8 @@ int main (void)
     unsigned char iv[EVP_CIPHER_iv_length(EVP_aes_256_cbc())];
     RAND_bytes(iv, EVP_CIPHER_iv_length(EVP_aes_256_cbc()));
 
-    // Encrypt the plaintext 
-    ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key,KEY_SIZE, iv,
+    // Encrypt the plaintext strlen ((char *)plaintext)
+    ciphertext_len = encrypt (plaintext, PASS_SIZE, key,KEY_SIZE, iv,
                               EVP_CIPHER_iv_length(EVP_aes_256_cbc()), ciphertext);
 
    // Do something useful with the ciphertext here 
@@ -130,9 +130,9 @@ int main (void)
     std::string combinedData(reinterpret_cast<char*>(salt), sizeof(salt));
     combinedData += std::string(reinterpret_cast<char*>(iv), EVP_CIPHER_iv_length(EVP_aes_256_cbc()));
     combinedData += std::string(reinterpret_cast<char*>(ciphertext), ciphertext_len);;
-
-    // Decrypt the ciphertext 
-    decryptedtext_len = decrypt(ciphertext, ciphertext_len, key, iv,
+    std::cout << ciphertext_len << std::endl;
+    // Decrypt the ciphertext ciphertext_len
+    decryptedtext_len = decrypt(ciphertext, 32, key, iv,
                                 decryptedtext);
 
     // Add a NULL terminator. We are expecting printable text 
