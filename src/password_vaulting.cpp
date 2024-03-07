@@ -6,9 +6,12 @@
  * information.
  */
 
+#include <fstream>
+#include <stdexcept>
 #include "../include/password_vaulting.hpp"
 
-VaultNode::VaultNode(const std::string& id, const std::string& pwd) : identifier(id), encrypted_password(pwd) {}
+VaultNode::VaultNode(const std::string& id, const std::string& pwd, const std::string& salt, const std::string& iv)
+    : identifier(id), encrypted_password(pwd), salt(salt), iv(iv) {}
 
 void SecureVault::add_node(const VaultNode& node) {
     nodes.push_back(node);
@@ -35,6 +38,14 @@ void SecureVault::serialize(const std::string& filename) const {
         size_t pwd_length = node.encrypted_password.size();
         file.write(reinterpret_cast<const char*>(&pwd_length), sizeof(pwd_length));
         file.write(node.encrypted_password.data(), pwd_length);
+
+        size_t salt_length = node.salt.size();
+        file.write(reinterpret_cast<const char*>(&salt_length), sizeof(salt_length));
+        file.write(node.salt.data(), salt_length);
+
+        size_t iv_length = node.iv.size();
+        file.write(reinterpret_cast<const char*>(&iv_length), sizeof(iv_length));
+        file.write(node.iv.data(), iv_length);
     }
 
     file.close();
@@ -61,7 +72,17 @@ void SecureVault::deserialize(const std::string& filename) {
         std::string pwd(pwd_length, '\0');
         file.read(&pwd[0], pwd_length);
 
-        nodes.emplace_back(id, pwd);
+        size_t salt_length;
+        file.read(reinterpret_cast<char*>(&salt_length), sizeof(salt_length));
+        std::string salt(salt_length, '\0');
+        file.read(&salt[0], salt_length);
+
+        size_t iv_length;
+        file.read(reinterpret_cast<char*>(&iv_length), sizeof(iv_length));
+        std::string iv(iv_length, '\0');
+        file.read(&iv[0], iv_length);
+
+        nodes.emplace_back(id, pwd, salt, iv);
     }
 
     file.close();

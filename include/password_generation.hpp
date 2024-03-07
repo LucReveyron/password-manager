@@ -6,6 +6,7 @@
 #include <random>
 
 #define SEED 50
+#define PASSWORD_LENGHT 12
 
 const std::vector<int> allowed_characters = {
     // Lowercase letters (97 - 122)
@@ -24,5 +25,6 @@ const std::vector<int> allowed_characters = {
 
 std::vector<uint8_t> generate_random_numbers(int8_t max_value, int8_t lenght);
 std::string create_password(uint8_t pass_lenght, bool rand = true);
+std::string return_encrypted_password(std::string master_password, unsigned char* salt, unsigned char* iv);
 
 #endif  // PASSWORD_GENERATION_HPP

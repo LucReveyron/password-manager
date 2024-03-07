@@ -1,20 +1,19 @@
-#ifndef PASSWORD_GENERATION_HPP  // Header guard to prevent multiple inclusions
-#define PASSWORD_GENERATION_HPP
+#ifndef PASSWORD_VAULTING_HPP  // Header guard to prevent multiple inclusions
+#define PASSWORD_VAULTING_HPP
 
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include <string>
-#include <stdexcept>
-
 
 // Represents a single node in the SecureVault, storing an identifier (e.g., a service name)
-// and an encrypted password for that service.
-struct VaultNode {
+// an encrypted password for that service, the salt and the IV use to encrypt him.
+class VaultNode {
+public:
     std::string identifier;
     std::string encrypted_password;
+    std::string salt;
+    std::string iv;
 
-    VaultNode(const std::string& id, const std::string& pwd);
+    VaultNode(const std::string& id, const std::string& pwd, const std::string& salt, const std::string& iv);
 };
 
 // SecureVault provides a secure storage mechanism for passwords, 

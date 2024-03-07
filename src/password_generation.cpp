@@ -1,4 +1,6 @@
 #include "../include/password_generation.hpp"
+#include "../include/password_encryption.hpp"
+#include <iostream>
 
 // Define a global random number generator engine
 std::mt19937 gen;
@@ -61,4 +63,35 @@ std::string create_password(uint8_t pass_lenght, bool rand)
     }
 
     return password;
+}
+
+std::string return_encrypted_password(std::string master_password, unsigned char* salt, unsigned char* iv)
+{
+    // Derive a 256-bit key from the master password
+    unsigned char key[KEY_SIZE] = {0};
+    derivekey_from_password(master_password, key, salt);
+
+    // Generate a password 
+    int8_t pass_lenght = PASSWORD_LENGHT;
+    std::string password = "";
+    password = create_password(pass_lenght);
+
+    // Message to be encrypted 
+    unsigned char *plaintext =
+        (unsigned char *)password.c_str();
+
+    //Buffer for ciphertext
+    unsigned char encrypted_password[PASS_SIZE] = {0};
+    int ciphertext_len = 0;
+
+    // Generate random IV at each encryption
+    RAND_bytes(iv, EVP_CIPHER_iv_length(EVP_aes_256_cbc()));
+
+    // Encrypt the plaintext 
+    ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key,KEY_SIZE, iv,
+                              EVP_CIPHER_iv_length(EVP_aes_256_cbc()), encrypted_password);
+
+    std::cout << ciphertext_len << std::endl;
+
+    return std::string(reinterpret_cast<const char*>(encrypted_password), KEY_SIZE);
 }

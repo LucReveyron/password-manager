@@ -76,6 +76,11 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, int
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
             unsigned char *iv, unsigned char *plaintext)
 {
+        // Check if any input pointer is null
+    if(plaintext == nullptr || key == nullptr || iv == nullptr || ciphertext == nullptr){
+        return -1;
+    }
+    
     EVP_CIPHER_CTX *ctx;
 
     int len;

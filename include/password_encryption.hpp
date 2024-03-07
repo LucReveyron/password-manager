@@ -11,7 +11,10 @@
 
 #define NBR_ITERATIONS  10000
 #define KEY_SIZE        32
+#define PASS_SIZE       16
 #define SALT_SIZE       16
+#define IV_SIZE         EVP_CIPHER_iv_length(EVP_aes_256_cbc())
+#define CIPHERTEXT_SIZE 12
 #define NULL_SIZE       1
 
 void derivekey_from_password(const std::string& password, unsigned char* derivedKey, unsigned char* salt);

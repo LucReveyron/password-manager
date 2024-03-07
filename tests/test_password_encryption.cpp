@@ -7,7 +7,7 @@
 
 TEST_CASE("Encrypt function test") {
     // Test data
-    unsigned char plaintext[] = "This is a test plaintext";
+    unsigned char plaintext[] = "12345678901";
     int plaintext_len = sizeof(plaintext) - 1; // excluding null terminator
     unsigned char key[] = "01234567890123456789012345678901"; // 256-bit key
     unsigned char iv[] = "0123456789012345"; // 128-bit IV
@@ -70,4 +70,19 @@ TEST_CASE("Encrypt and decrypt data using AES-256-CBC") {
 
     // Check if the decrypted text matches the original plaintext
     CHECK(strcmp((char*)plaintext, (char*)decryptedtext) == 0);
+
+        SUBCASE("Null pointers") {
+        // Passing null pointers should result in an error
+        int ciphertext_len = decrypt(nullptr, plaintext_len, key, iv, ciphertext);
+        CHECK(ciphertext_len == -1); // Check if error code is returned
+
+        ciphertext_len = decrypt(plaintext, plaintext_len, nullptr, iv, ciphertext);
+        CHECK(ciphertext_len == -1); // Check if error code is returned
+
+        ciphertext_len = decrypt(plaintext, plaintext_len, key, nullptr, ciphertext);
+        CHECK(ciphertext_len == -1); // Check if error code is returned
+
+        ciphertext_len = decrypt(plaintext, plaintext_len, key, iv, nullptr);
+        CHECK(ciphertext_len == -1); // Check if error code is returned
+    }
 }
