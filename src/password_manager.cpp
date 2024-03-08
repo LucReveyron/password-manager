@@ -1,6 +1,7 @@
 #include "../include/password_encryption.hpp"
 #include "../include/password_generation.hpp"
 #include "../include/password_manager.hpp"
+#include "../include/utils.hpp"
 
 void string_to_unsigned_char(const std::string& str, unsigned char* uchar_texto, size_t size)
 {
@@ -19,10 +20,12 @@ PasswordManager::~PasswordManager()
 
 void PasswordManager::add_password(const std::string &login)
 {
+    disableEcho();
     std::string master_password = "";
     std::cout << "Please enter the master password : \n";
     std::cin >> master_password;
     // To do : password verification based on hashing
+    restoreEcho();
 
     // Salt for PBKDF2
     unsigned char salt[SALT_SIZE] = {0};
@@ -58,9 +61,12 @@ void PasswordManager::search_passwords()
         size_t iv_size = 0;
         unsigned char* iv= base64_decode(node.iv, iv_size);
 
+        disableEcho();
         std::string master_password = "";
         std::cout << "Please enter the master password : \n";
         std::cin >> master_password;
+        restoreEcho();
+        
         unsigned char key[KEY_SIZE] = {0};
         derivekey_from_password(master_password, key, salt);
 
