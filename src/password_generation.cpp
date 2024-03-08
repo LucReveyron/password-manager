@@ -130,8 +130,6 @@ std::string return_encrypted_password(std::string master_password, unsigned char
     ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, sizeof(key), iv,
                               EVP_CIPHER_iv_length(EVP_aes_256_cbc()), encrypted_password);
 
-    std::cout << " Encoded password : " << ciphertext_len << std::endl;
     std::string encoded_password = base64_encode(encrypted_password, ciphertext_len);
-    std::cout << " Encoded password : " << encoded_password << std::endl;
     return encoded_password;
 }

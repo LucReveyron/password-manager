@@ -58,19 +58,6 @@ void PasswordManager::search_passwords()
         size_t iv_size = 0;
         unsigned char* iv= base64_decode(node.iv, iv_size);
 
-        /* DEBUGGING */
-        std::cout << " encoded password : " << node.encrypted_password << std::endl;
-        std::cout << " encoded salt : " << node.salt << std::endl;
-        std::cout << " encoded iv : " << node.iv << std::endl;
-
-        printf("Decoded password: ");
-        BIO_dump_fp (stdout, (const char *)encrypted_password, encrypt_password_size);
-        printf("Decoded salt: ");
-        BIO_dump_fp (stdout, (const char *)salt, salt_size);
-        printf("Decoded iv: ");
-        BIO_dump_fp (stdout, (const char *)iv, iv_size);
-        /* DEBUGGING */
-
         std::string master_password = "";
         std::cout << "Please enter the master password : \n";
         std::cin >> master_password;

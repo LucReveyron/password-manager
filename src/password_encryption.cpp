@@ -97,7 +97,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     /* Create and initialise the context */
     if(!(ctx = EVP_CIPHER_CTX_new()))
         handle_errors();
-    std::cout << " ok : " << 1 << std::endl;
+
     /*
      * Initialise the decryption operation. IMPORTANT - ensure you use a key
      * and IV size appropriate for your cipher
@@ -109,7 +109,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
         EVP_CIPHER_CTX_free(ctx);
         handle_errors();
     }
-    std::cout << " ok : " << 2 << std::endl;
+
     /*
      * Provide the message to be decrypted, and obtain the plaintext output.
      * EVP_DecryptUpdate can be called multiple times if necessary.
@@ -119,7 +119,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
         handle_errors();
     }
     plaintext_len = len;
-    std::cout << " ok : " << 3 << std::endl;
+
     /*
      * Finalise the decryption. Further plaintext bytes may be written at
      * this stage.
@@ -131,10 +131,10 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
         handle_errors();
     }
     plaintext_len += len;
-    std::cout << " ok : " << 4 << std::endl;
+
     /* Clean up */
     EVP_CIPHER_CTX_free(ctx);
-    std::cout << " ok : " << 5 << std::endl;
+
     return plaintext_len;
 }
 
