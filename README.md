@@ -41,8 +41,8 @@ This will compile the source files and generate the executable password_manager.
 ## Dependencies
 
 - [OpenSSL](https://www.openssl.org/): Used for encryption and decryption functionalities.
-- [CMake](https://cmake.org/): Build system used for compiling the project.
-- [Boost C++ Libraries](https://www.boost.org/): Optional library for additional functionality (if applicable).
+- C++11 or Later Compiler: Compiler supporting C++11 standard or later.
+- Standard C++ Libraries: Standard libraries used in the C++ programming language.
 
 ## License
 
