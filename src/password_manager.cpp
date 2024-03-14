@@ -1,3 +1,14 @@
+/**
+ * @file   password_manager.cpp
+ * @brief  Implementation of a password manager for handling encrypted passwords.
+ * 
+ * This file contains the implementation of a password manager class, which provides
+ * functionality for adding, searching, and managing encrypted passwords stored in a vault.
+ * 
+ * @author Luc Reveyron
+ * @date   14/03/2024
+ */
+
 #include "../include/password_encryption.hpp"
 #include "../include/password_generation.hpp"
 #include "../include/password_manager.hpp"
@@ -71,7 +82,7 @@ void PasswordManager::search_passwords()
         derivekey_from_password(master_password, key, salt);
 
         unsigned char decrypted_password[encrypt_password_size];
-        //Bug here !!!
+
         std::cout << " decode pass size  : " << encrypt_password_size << std::endl;
         int decryptedtext_len = decrypt(encrypted_password, encrypt_password_size, key, iv, decrypted_password); 
         std::cout << "Password for " << node.identifier << ": " << decrypted_password << std::endl;

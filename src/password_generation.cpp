@@ -1,3 +1,13 @@
+/**
+ * @file   password_generation.hpp
+ * @brief  Functions for generating and managing passwords.
+ * 
+ * This header file declares functions related to password generation and management.
+ * 
+ * @author Luc Reveyron
+ * @date   13/03/2024
+ */
+
 #include "../include/password_generation.hpp"
 #include "../include/password_encryption.hpp"
 #include <iostream>
@@ -9,14 +19,6 @@
 std::mt19937 gen;
 
 std::vector<uint8_t> generate_random_numbers(int8_t max_value, int8_t lenght) {
-    /*
-    Generate vector of random number
-
-    Input : 
-        - max_value : define boundary for normal distribution of random generation
-        - lenght : define the lenght of the vector
-    Output: vector of random number
-    */
 
     // Define the distribution
     std::uniform_int_distribution<> dis(0, max_value);
@@ -38,14 +40,6 @@ std::vector<uint8_t> generate_random_numbers(int8_t max_value, int8_t lenght) {
 
 std::string create_password(uint8_t pass_lenght, bool rand)
 {
-    /*
-    Generate a string password with random number, character and special character
-
-    Input : 
-        - pass_lenght : size of the password
-        - rand : allow to fixe seed of random number for testing
-    Output : string of size pass_lenght 
-    */
 
     // Initialize the random number generator engine based on the value of 'rand'
     if(rand){

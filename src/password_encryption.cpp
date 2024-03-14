@@ -1,3 +1,14 @@
+/**
+ * @file   password_encryption.cpp
+ * @brief  Implementation of functions for password-based encryption and decryption.
+ * 
+ * This file contains the implementation of functions for deriving a key from a password,
+ * encrypting plaintext using AES-256 CBC mode, and decrypting ciphertext.
+ * 
+ * @author Luc Reveyron
+ * @date   14/03/2024
+ */
+
 #include <iostream>
 #include "../include/password_encryption.hpp"
 

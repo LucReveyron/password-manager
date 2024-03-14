@@ -1,3 +1,13 @@
+/**
+ * @file   utils.cpp
+ * @brief  Implementation of utility functions for handling console input echoing.
+ * 
+ * This file contains the implementation of functions to disable and restore echoing of user input on the console.
+ * 
+ * @author Luc Reveyron
+ * @date   14/03/2024
+ */
+
 #include "../include/utils.hpp"
 
 // Function to turn off echoing

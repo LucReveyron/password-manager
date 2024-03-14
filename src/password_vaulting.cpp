@@ -1,9 +1,11 @@
 /**
- * @file password_vaulting.cpp
- * @brief This file contains the implementation of the VaultNode and SecureVault classes.
- *
- * VaultNode and SecureVault are use to manage the data structure that store password manager 
- * information.
+ * @file   password_vaulting.hpp
+ * @brief  Declaration of classes and functions for secure password vaulting.
+ * 
+ * This header file declares classes and functions related to securely storing passwords in a vault.
+ * 
+ * @author Luc Reveyron
+ * @date   13/03/2024
  */
 
 #include <fstream>
