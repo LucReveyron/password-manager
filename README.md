@@ -1,5 +1,8 @@
 # Password Manager Project
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 A simple password manager application for securely storing and managing passwords. This project provides a menu-driven interface for adding new passwords, searching existing passwords, and exiting the program.
 
 ## Features
