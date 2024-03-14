@@ -6,8 +6,8 @@ LDLIBS = -lssl -lcrypto
 SRC_DIR = src
 TEST_DIR = tests
 BUILD_DIR = build
-TARGET = prog
-TEST_TARGET = test_prog
+TARGET = password_manager
+TEST_TARGET = test_password_manager
 
 # Source and object files for the main target
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
